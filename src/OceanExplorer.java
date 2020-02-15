@@ -18,13 +18,15 @@ public class OceanExplorer extends Application {
 	Image shipImage;
 	ImageView shipImageView;
 	int[][] oceanGrid = oceanMap.getMap();
-	Ship ship = new Ship(5, 5);
+	Random rand = new Random();
+	int rand_x = rand.nextInt(oceanMap.dimension);
+	int rand_y = rand.nextInt(oceanMap.dimension);
+	Ship ship = new Ship(rand_x, rand_y);
 	public enum OceanItems
 	{
 		OCEAN(0),
 		ISLAND(1),
-		SHIP(2),
-		PIRATE(3);
+		PIRATE(2);
 		
 		public final int intValue;
 		OceanItems(int intValue)
@@ -43,8 +45,24 @@ public class OceanExplorer extends Application {
 		oceanStage.show();
 		drawMap();
 		placeIsland(10);
+		if (oceanGrid[ship.currentLocation.x][ship.currentLocation.y] != OceanItems.OCEAN.getIntValue())
+		{
+			while(oceanGrid[ship.currentLocation.x][ship.currentLocation.y] != OceanItems.OCEAN.getIntValue())
+			{
+				rand_x = rand.nextInt(oceanMap.dimension);
+				rand_y = rand.nextInt(oceanMap.dimension);
+				ship.currentLocation.x = rand_x;
+				ship.currentLocation.y = rand_y;
+			}	
+		}
 		loadShipImage();
 		startSailing();
+		for (int x = 0; x < oceanMap.dimension; x++) {
+			for (int y = 0; y < oceanMap.dimension; y++) {
+				System.out.print(oceanGrid[x][y] + " | ");
+			}
+			System.out.println();
+		}
 	}
 	
 	public static void main(String[] args) {
@@ -68,8 +86,8 @@ public class OceanExplorer extends Application {
 		Random rand = new Random();
 		for (int i = 0; i < num; i++)
 		{
-			int rand_x = rand.nextInt(oceanMap.dimension);
-			int rand_y = rand.nextInt(oceanMap.dimension);
+			rand_x = rand.nextInt(oceanMap.dimension);
+			rand_y = rand.nextInt(oceanMap.dimension);
 			oceanGrid[rand_x][rand_y] = OceanItems.ISLAND.getIntValue();
 			Rectangle rect = new Rectangle(rand_x*oceanMap.scale, rand_y*oceanMap.scale, oceanMap.scale, oceanMap.scale);
 			rect.setStroke(Color.BLACK);
@@ -92,16 +110,27 @@ public class OceanExplorer extends Application {
 				switch(ke.getCode())
 				{
 					case RIGHT:
-						ship.goEast();
+						if (ship.getShipLocation().x < oceanMap.dimension-1) 
+						{
+							if (oceanGrid[ship.getShipLocation().x+1][ship.getShipLocation().y] == OceanItems.OCEAN.getIntValue()) ship.goEast();	
+						}
 						break;
 					case LEFT:
-						ship.goWest();
+						if (ship.getShipLocation().x > 0) 
+						{
+							if (oceanGrid[ship.getShipLocation().x-1][ship.getShipLocation().y] == OceanItems.OCEAN.getIntValue()) ship.goWest();
+						}
 						break;
 					case UP:
-						ship.goNorth();
+						if (ship.getShipLocation().y > 0) {
+							if (oceanGrid[ship.getShipLocation().x][ship.getShipLocation().y-1] == OceanItems.OCEAN.getIntValue()) ship.goNorth();
+						}
 						break;
 					case DOWN:
-						ship.goSouth();
+						if (ship.getShipLocation().y < oceanMap.dimension-1)
+						{
+							if (oceanGrid[ship.getShipLocation().x][ship.getShipLocation().y+1] == OceanItems.OCEAN.getIntValue()) ship.goSouth();	
+						}
 						break;
 					default:
 						break;
