@@ -1,6 +1,7 @@
 import java.awt.Point;
+import java.util.Observable;
 
-public class Ship 
+public class Ship extends Observable
 {
 	Point currentLocation = new Point();
 	
@@ -18,17 +19,25 @@ public class Ship
 	
 	public void goEast() {
 		currentLocation.x = currentLocation.x + 1;
+		setChanged();
+		notifyObservers();
 	}
 	
 	public void goWest() {
 		currentLocation.x = currentLocation.x - 1;
+		setChanged();
+		notifyObservers();
 	}
 	
 	public void goNorth() {
 		currentLocation.y = currentLocation.y - 1;
+		setChanged();
+		notifyObservers();
 	}
 	
 	public void goSouth() {
 		currentLocation.y = currentLocation.y + 1;
+		setChanged();
+		notifyObservers();
 	}
 }

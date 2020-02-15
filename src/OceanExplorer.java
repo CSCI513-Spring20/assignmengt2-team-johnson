@@ -17,16 +17,20 @@ public class OceanExplorer extends Application {
 	Scene scene = new Scene(myPane, oceanMap.scale*oceanMap.dimension, oceanMap.scale*oceanMap.dimension);
 	Image shipImage;
 	ImageView shipImageView;
+	Image pirateImage;
+	ImageView pirateImageView;
 	int[][] oceanGrid = oceanMap.getMap();
 	Random rand = new Random();
 	int rand_x = rand.nextInt(oceanMap.dimension);
 	int rand_y = rand.nextInt(oceanMap.dimension);
 	Ship ship = new Ship(rand_x, rand_y);
+	PirateShip pirateShip_1 = new PirateShip(0, 0, oceanGrid);
 	public enum OceanItems
 	{
 		OCEAN(0),
 		ISLAND(1),
-		PIRATE(2);
+		SHIP(2),
+		PIRATE(3);
 		
 		public final int intValue;
 		OceanItems(int intValue)
@@ -39,30 +43,17 @@ public class OceanExplorer extends Application {
 	
 	
 	public void start(Stage oceanStage) throws Exception {
-		
 		oceanStage.setScene(scene);
 		oceanStage.setTitle("Christopher Columbus Game");
 		oceanStage.show();
+		ship.addObserver(pirateShip_1);
 		drawMap();
 		placeIsland(10);
-		if (oceanGrid[ship.currentLocation.x][ship.currentLocation.y] != OceanItems.OCEAN.getIntValue())
-		{
-			while(oceanGrid[ship.currentLocation.x][ship.currentLocation.y] != OceanItems.OCEAN.getIntValue())
-			{
-				rand_x = rand.nextInt(oceanMap.dimension);
-				rand_y = rand.nextInt(oceanMap.dimension);
-				ship.currentLocation.x = rand_x;
-				ship.currentLocation.y = rand_y;
-			}	
-		}
+		placeShip();
 		loadShipImage();
+		placePirate();
+		loadPirateImage();
 		startSailing();
-		for (int x = 0; x < oceanMap.dimension; x++) {
-			for (int y = 0; y < oceanMap.dimension; y++) {
-				System.out.print(oceanGrid[x][y] + " | ");
-			}
-			System.out.println();
-		}
 	}
 	
 	public static void main(String[] args) {
@@ -70,14 +61,23 @@ public class OceanExplorer extends Application {
 	}
 	
 	public void drawMap() {
-		for (int x = 0; x < oceanMap.dimension; x++) {
-			for (int y = 0; y < oceanMap.dimension; y++) {
+		for (int y = 0; y < oceanMap.dimension; y++) {
+			for (int x = 0; x < oceanMap.dimension; x++) {
 				oceanGrid[x][y] = OceanItems.OCEAN.getIntValue();
 				Rectangle rect = new Rectangle(x*oceanMap.scale, y*oceanMap.scale, oceanMap.scale, oceanMap.scale);
 				rect.setStroke(Color.BLACK);
 				rect.setFill(Color.AQUAMARINE);
 				myPane.getChildren().add(rect);
 			}
+		}
+	}
+	
+	public void drawConsoleMap() {
+		for (int y = 0; y < oceanMap.dimension; y++) {
+			for (int x = 0; x < oceanMap.dimension; x++) {
+				System.out.print(oceanGrid[x][y] + " | ");
+			}
+			System.out.println();
 		}
 	}
 	
@@ -96,12 +96,51 @@ public class OceanExplorer extends Application {
 		}
 	}
 	
+	public void placeShip()
+	{
+		if (oceanGrid[ship.getShipLocation().x][ship.getShipLocation().y] != OceanItems.OCEAN.getIntValue())
+		{
+			while(oceanGrid[ship.getShipLocation().x][ship.getShipLocation().y] != OceanItems.OCEAN.getIntValue())
+			{
+				rand_x = rand.nextInt(oceanMap.dimension);
+				rand_y = rand.nextInt(oceanMap.dimension);
+				ship.currentLocation.x = rand_x;
+				ship.currentLocation.y = rand_y;
+			}
+		}
+		oceanGrid[ship.getShipLocation().x][ship.getShipLocation().y] = OceanItems.SHIP.getIntValue();
+	}
+	
+	public void placePirate()
+	{
+		if (oceanGrid[pirateShip_1.getShipLocation().x][pirateShip_1.getShipLocation().y] != OceanItems.OCEAN.getIntValue())
+		{
+			while(oceanGrid[pirateShip_1.getShipLocation().x][pirateShip_1.getShipLocation().y] != OceanItems.OCEAN.getIntValue())
+			{
+				rand_x = rand.nextInt(oceanMap.dimension);
+				rand_y = rand.nextInt(oceanMap.dimension);
+				pirateShip_1.piratePosition.x = rand_x;
+				pirateShip_1.piratePosition.y = rand_y;
+			}	
+		}
+		oceanGrid[pirateShip_1.getShipLocation().x][pirateShip_1.getShipLocation().y] = OceanItems.PIRATE.getIntValue();
+	}
+	
 	public void loadShipImage() {
 		shipImage = new Image("ship.png", 50, 50, true, true);
 		shipImageView = new ImageView(shipImage);
 		shipImageView.setX(ship.getShipLocation().x * oceanMap.scale);
 		shipImageView.setY(ship.getShipLocation().y * oceanMap.scale);
 		myPane.getChildren().add(shipImageView);
+	}
+	
+	public void loadPirateImage()
+	{
+		pirateImage = new Image("pirateShip.png", 50, 50, true, true);
+		pirateImageView = new ImageView(pirateImage);
+		pirateImageView.setX(pirateShip_1.getShipLocation().x * oceanMap.scale);
+		pirateImageView.setY(pirateShip_1.getShipLocation().y * oceanMap.scale);
+		myPane.getChildren().add(pirateImageView);
 	}
 	
 	private void startSailing() {
@@ -112,24 +151,64 @@ public class OceanExplorer extends Application {
 					case RIGHT:
 						if (ship.getShipLocation().x < oceanMap.dimension-1) 
 						{
-							if (oceanGrid[ship.getShipLocation().x+1][ship.getShipLocation().y] == OceanItems.OCEAN.getIntValue()) ship.goEast();	
+							if (oceanGrid[ship.getShipLocation().x+1][ship.getShipLocation().y] == OceanItems.OCEAN.getIntValue()) 
+								{
+									oceanGrid[ship.getShipLocation().x][ship.getShipLocation().y] = OceanItems.OCEAN.getIntValue();
+									oceanGrid[ship.getShipLocation().x+1][ship.getShipLocation().y] = OceanItems.SHIP.getIntValue();
+									oceanGrid[pirateShip_1.getShipLocation().x][pirateShip_1.getShipLocation().y] = OceanItems.OCEAN.getIntValue();
+									ship.goEast();
+									oceanGrid[pirateShip_1.getShipLocation().x][pirateShip_1.getShipLocation().y] = OceanItems.PIRATE.getIntValue();
+									drawConsoleMap();
+									pirateImageView.setX(pirateShip_1.getShipLocation().x * oceanMap.scale);
+									pirateImageView.setY(pirateShip_1.getShipLocation().y * oceanMap.scale);
+								}
 						}
 						break;
 					case LEFT:
 						if (ship.getShipLocation().x > 0) 
 						{
-							if (oceanGrid[ship.getShipLocation().x-1][ship.getShipLocation().y] == OceanItems.OCEAN.getIntValue()) ship.goWest();
+							if (oceanGrid[ship.getShipLocation().x-1][ship.getShipLocation().y] == OceanItems.OCEAN.getIntValue()) 
+								{
+									oceanGrid[ship.getShipLocation().x][ship.getShipLocation().y] = OceanItems.OCEAN.getIntValue();
+									oceanGrid[ship.getShipLocation().x-1][ship.getShipLocation().y] = OceanItems.SHIP.getIntValue();
+									oceanGrid[pirateShip_1.getShipLocation().x][pirateShip_1.getShipLocation().y] = OceanItems.OCEAN.getIntValue();
+									ship.goWest();
+									oceanGrid[pirateShip_1.getShipLocation().x][pirateShip_1.getShipLocation().y] = OceanItems.PIRATE.getIntValue();
+									drawConsoleMap();
+									pirateImageView.setX(pirateShip_1.getShipLocation().x * oceanMap.scale);
+									pirateImageView.setY(pirateShip_1.getShipLocation().y * oceanMap.scale);
+								}
 						}
 						break;
 					case UP:
 						if (ship.getShipLocation().y > 0) {
-							if (oceanGrid[ship.getShipLocation().x][ship.getShipLocation().y-1] == OceanItems.OCEAN.getIntValue()) ship.goNorth();
+							if (oceanGrid[ship.getShipLocation().x][ship.getShipLocation().y-1] == OceanItems.OCEAN.getIntValue())
+								{
+									oceanGrid[ship.getShipLocation().x][ship.getShipLocation().y] = OceanItems.OCEAN.getIntValue();
+									oceanGrid[ship.getShipLocation().x][ship.getShipLocation().y-1] = OceanItems.SHIP.getIntValue();
+									oceanGrid[pirateShip_1.getShipLocation().x][pirateShip_1.getShipLocation().y] = OceanItems.OCEAN.getIntValue();
+									ship.goNorth();
+									oceanGrid[pirateShip_1.getShipLocation().x][pirateShip_1.getShipLocation().y] = OceanItems.PIRATE.getIntValue();
+									drawConsoleMap();
+									pirateImageView.setX(pirateShip_1.getShipLocation().x * oceanMap.scale);
+									pirateImageView.setY(pirateShip_1.getShipLocation().y * oceanMap.scale);
+								}
 						}
 						break;
 					case DOWN:
 						if (ship.getShipLocation().y < oceanMap.dimension-1)
 						{
-							if (oceanGrid[ship.getShipLocation().x][ship.getShipLocation().y+1] == OceanItems.OCEAN.getIntValue()) ship.goSouth();	
+							if (oceanGrid[ship.getShipLocation().x][ship.getShipLocation().y+1] == OceanItems.OCEAN.getIntValue())
+								{
+									oceanGrid[ship.getShipLocation().x][ship.getShipLocation().y] = OceanItems.OCEAN.getIntValue();
+									oceanGrid[ship.getShipLocation().x][ship.getShipLocation().y+1] = OceanItems.SHIP.getIntValue();
+									oceanGrid[pirateShip_1.getShipLocation().x][pirateShip_1.getShipLocation().y] = OceanItems.OCEAN.getIntValue();
+									ship.goSouth();	
+									oceanGrid[pirateShip_1.getShipLocation().x][pirateShip_1.getShipLocation().y] = OceanItems.PIRATE.getIntValue();
+									drawConsoleMap();
+									pirateImageView.setX(pirateShip_1.getShipLocation().x * oceanMap.scale);
+									pirateImageView.setY(pirateShip_1.getShipLocation().y * oceanMap.scale);
+								}
 						}
 						break;
 					default:
