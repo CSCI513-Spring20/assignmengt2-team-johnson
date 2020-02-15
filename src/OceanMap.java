@@ -3,7 +3,6 @@ public class OceanMap {
 	final int dimension = 10;
 	final int scale = 50;
 	
-
 	public int[][] getMap(){
 		return oceanMap;
 	}
