@@ -72,7 +72,7 @@ public class OceanExplorer extends Application {
 				oceanGrid[x][y] = OceanItems.OCEAN.getIntValue();
 				Rectangle rect = new Rectangle(x*oceanMap.scale, y*oceanMap.scale, oceanMap.scale, oceanMap.scale);
 				rect.setStroke(Color.BLACK);
-				rect.setFill(Color.AQUAMARINE);
+				rect.setFill(Color.PALETURQUOISE);
 				myPane.getChildren().add(rect);
 			}
 		}
