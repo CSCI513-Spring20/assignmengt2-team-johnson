@@ -1,3 +1,4 @@
+import java.awt.Point;
 import java.util.Random;
 import javafx.application.Application;
 import javafx.event.EventHandler;
@@ -54,8 +55,8 @@ public class OceanExplorer extends Application {
 		placeIsland(10);
 		placeShip();
 		loadShipImage();
-		placePirate(pirateShip_1);
-		placePirate(pirateShip_2);
+		pirateShip_1.piratePosition = placePirate(pirateShip_1);
+		pirateShip_2.piratePosition = placePirate(pirateShip_2);
 		loadPirateImage_1();
 		loadPirateImage_2();
 		startSailing();
@@ -71,7 +72,7 @@ public class OceanExplorer extends Application {
 				oceanGrid[x][y] = OceanItems.OCEAN.getIntValue();
 				Rectangle rect = new Rectangle(x*oceanMap.scale, y*oceanMap.scale, oceanMap.scale, oceanMap.scale);
 				rect.setStroke(Color.BLACK);
-				rect.setFill(Color.AQUAMARINE);
+				rect.setFill(Color.PALETURQUOISE);
 				myPane.getChildren().add(rect);
 			}
 		}
@@ -116,7 +117,7 @@ public class OceanExplorer extends Application {
 		oceanGrid[ship.getShipLocation().x][ship.getShipLocation().y] = OceanItems.SHIP.getIntValue();
 	}
 	
-	public void placePirate(PirateShip p)
+	public Point placePirate(PirateShip p)
 	{
 		if (oceanGrid[p.getShipLocation().x][p.getShipLocation().y] != OceanItems.OCEAN.getIntValue())
 		{
@@ -129,6 +130,7 @@ public class OceanExplorer extends Application {
 			}	
 		}
 		oceanGrid[p.getShipLocation().x][p.getShipLocation().y] = OceanItems.PIRATE.getIntValue();
+		return p.piratePosition;
 	}
 	
 	public void loadShipImage() {
