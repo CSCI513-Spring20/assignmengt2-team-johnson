@@ -1,3 +1,11 @@
+/* File: PirateShip.java
+ * 
+ * Created by: Donald Johnson
+ * 
+ * Purpose: The PirateShip class stores the location of a pirate ship and handles the movement conditions when prompted by the update method.
+ * 			Instances of this class are observers of instances of Ships.
+ */
+
 import java.awt.Point;
 import java.util.Observable;
 import java.util.Observer;

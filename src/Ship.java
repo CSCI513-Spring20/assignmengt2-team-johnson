@@ -1,3 +1,11 @@
+/* File: Ship.java
+ * 
+ * Created by: Donald Johnson
+ * 
+ * Purpose: The Ship class stores and changes the ship's location when a prompted by a key event triggered in OceanExplorer.
+ * 			Instances of this class are observed by instances of PirateShips. 
+ */
+
 import java.awt.Point;
 import java.util.Observable;
 

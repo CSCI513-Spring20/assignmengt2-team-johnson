@@ -1,3 +1,10 @@
+/* File: OceanExplorer.java
+ * 
+ * Created by: Donald Johnson
+ * 
+ * Purpose: The OceanExplorer class uses the javafx libraries to display an instance of an OceanMap, a Ship, and multiple instances of PirateShips.
+ */
+
 import java.awt.Point;
 import java.util.Random;
 import javafx.application.Application;
